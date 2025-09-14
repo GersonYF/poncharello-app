@@ -58,13 +58,11 @@ export default function ArduinoScreen(): JSX.Element {
 
   // Mapeo de comandos a imágenes con tipos
   const imageMap: ImageMap = {
-    'luz': 'https://via.placeholder.com/120/FFD700/000000?text=💡',
-    'agua': 'https://via.placeholder.com/120/4A90E2/FFFFFF?text=💧',
-    'fuego': 'https://via.placeholder.com/120/FF4444/FFFFFF?text=🔥',
-    'aire': 'https://via.placeholder.com/120/87CEEB/000000?text=💨',
-    'tierra': 'https://via.placeholder.com/120/8B4513/FFFFFF?text=🌍',
-    'off': 'https://via.placeholder.com/120/999999/FFFFFF?text=OFF',
-    'on': 'https://via.placeholder.com/120/4CAF50/FFFFFF?text=ON',
+    'siga': 'https://placehold.co/200/4CAF50/FFFFFF?text=SIGA',
+    'pare': 'https://placehold.co/200/FF4444/FFFFFF?text=PARE',
+    'gire_derecha': 'https://placehold.co/200/2196F3/FFFFFF?text=GIRE+A+LA+DERECHA',
+    'gire_izquierda': 'https://placehold.co/200/FF9800/FFFFFF?text=GIRE+A+LA+IZQUIERDA',
+    'reversa': 'https://placehold.co/200/9C27B0/FFFFFF?text=REVERSA',
   };
 
   useEffect(() => {
@@ -215,7 +213,7 @@ export default function ArduinoScreen(): JSX.Element {
   };
 
   const simulateData = (): void => {
-    const commands = ['luz', 'agua', 'fuego', 'aire', 'tierra', 'on', 'off'];
+    const commands = ['siga', 'pare', 'gire_derecha', 'gire_izquierda', 'reversa'];
     let index = 0;
     
     const interval = setInterval(() => {
@@ -235,7 +233,7 @@ export default function ArduinoScreen(): JSX.Element {
     if (imageMap[command]) {
       setCurrentImage(imageMap[command]);
     } else {
-      setCurrentImage(`https://via.placeholder.com/120/6C63FF/FFFFFF?text=${encodeURIComponent(command.toUpperCase())}`);
+      setCurrentImage(`https://placehold.co/200/6C63FF/FFFFFF?text=${encodeURIComponent(command.toUpperCase())}`);
     }
   };
 
@@ -581,8 +579,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   displayImage: {
-    width: 120,
-    height: 120,
+    width: 200,
+    height: 200,
     borderRadius: 60,
   },
   receivedText: {
