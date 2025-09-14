@@ -33,7 +33,7 @@ export default function TabLayout() {
         name="arduino"
         options={{
           title: 'Arduino',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="antenna.radiowaves.left.and.right" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="chevron.left.forwardslash.chevron.right" color={color} />,
         }}
       />
     </Tabs>
