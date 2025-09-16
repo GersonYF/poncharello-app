@@ -355,7 +355,7 @@ export default function ArduinoScreen(): JSX.Element {
       console.error('Error enviando comando:', error);
       Alert.alert('Error', 'No se pudo enviar el comando');
     }
-  };
+  }; 
 
   const disconnect = async (): Promise<void> => {
     try {
