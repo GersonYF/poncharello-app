@@ -1,63 +1,83 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { StyleSheet, View } from 'react-native';
 
 import { HelloWave } from '@/components/hello-wave';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
-import { JSX } from 'react';
+import React, { JSX, useEffect } from 'react';
+import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
 
 export default function HomeScreen(): JSX.Element {
+  // UI animation shared values
+  const headerAnim = useSharedValue(0);
+  const ctaScale = useSharedValue(1);
+
+  const headerStyle = useAnimatedStyle(() => ({
+    opacity: headerAnim.value,
+    transform: [{ translateY: headerAnim.value ? 0 : -10 }],
+  }));
+
+  const ctaStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: ctaScale.value }],
+  }));
+
+  useEffect(() => {
+    headerAnim.value = withTiming(1, { duration: 600 });
+    // small entrance pulse for CTA
+    ctaScale.value = withSequence(withTiming(1.06, { duration: 200 }), withTiming(1, { duration: 220 }));
+  }, [headerAnim, ctaScale]);
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#667eea', dark: '#1D3D47' }}
       headerImage={
         <LinearGradient
-          colors={['#667eea', '#764ba2', '#f093fb']}
+          // softer, more neutral gradient
+          colors={['#3a7bd5', '#00d2ff']}
+          start={[0, 0]}
+          end={[1, 1]}
           style={styles.headerGradient}
         >
-          <View style={styles.headerContent}>
-            <View style={styles.iconContainer}>
+          <Animated.View style={[styles.headerContent, headerStyle] as any}>
+            <View style={styles.iconContainerFixed}>
               <ThemedText style={styles.iconText}>🤖</ThemedText>
             </View>
             <ThemedText style={styles.courseTitle}>IA en Embebidos</ThemedText>
             <ThemedText style={styles.courseSubtitle}>Arduino BLE Controller</ThemedText>
-          </View>
+          </Animated.View>
         </LinearGradient>
       }>
-      
+
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">¡Bienvenidos!</ThemedText>
         <HelloWave />
       </ThemedView>
 
-      <ThemedView style={styles.projectInfoContainer}>
-        <ThemedText type="subtitle">📚 Información del Proyecto</ThemedText>
-        <ThemedView style={styles.infoCard}>
-          <ThemedText style={styles.courseName}>
-            <ThemedText type="defaultSemiBold">Curso:</ThemedText> IA en Embebidos
-          </ThemedText>
-          <ThemedText style={styles.program}>
-            <ThemedText type="defaultSemiBold">Programa:</ThemedText> Ingeniería de Datos e IA
-          </ThemedText>
-        </ThemedView>
-      </ThemedView>
+      <ThemedView style={styles.summaryCardContainer}>
+        <ThemedView style={styles.summaryCard}>
+          <ThemedText style={styles.summaryTitle}>IA en Embebidos</ThemedText>
+          <ThemedText style={styles.summarySubtitle}>Arduino BLE Controller • Ingeniería de Datos e IA</ThemedText>
 
-      <ThemedView style={styles.participantsContainer}>
-        <ThemedText type="subtitle">👥 Participantes</ThemedText>
-        <ThemedView style={styles.participantCard}>
-          <View style={styles.participantItem}>
-            <ThemedText style={styles.participantIcon}>👨‍💻</ThemedText>
+          <View style={styles.summaryRow}>
+            <View style={styles.summaryItem}>
+              <ThemedText style={styles.summaryIcon}>📡</ThemedText>
+              <ThemedText style={styles.summaryText}>Conexión BLE</ThemedText>
+            </View>
+            <View style={styles.summaryItem}>
+              <ThemedText style={styles.summaryIcon}>�️</ThemedText>
+              <ThemedText style={styles.summaryText}>Visualización</ThemedText>
+            </View>
+            <View style={styles.summaryItem}>
+              <ThemedText style={styles.summaryIcon}>⚡</ThemedText>
+              <ThemedText style={styles.summaryText}>Respuesta</ThemedText>
+            </View>
+          </View>
+
+          <View style={styles.participantsCompact}>
             <ThemedText style={styles.participantName}>Gerson Yarce Franco</ThemedText>
-          </View>
-          <View style={styles.participantItem}>
-            <ThemedText style={styles.participantIcon}>👨‍💻</ThemedText>
             <ThemedText style={styles.participantName}>David Velásquez Lenis</ThemedText>
-          </View>
-          <View style={styles.participantItem}>
-            <ThemedText style={styles.participantIcon}>👨‍💻</ThemedText>
             <ThemedText style={styles.participantName}>Juan Mayorquin</ThemedText>
           </View>
         </ThemedView>
@@ -67,7 +87,7 @@ export default function HomeScreen(): JSX.Element {
         <ThemedText type="subtitle">🚀 Proyecto: Control Arduino BLE</ThemedText>
         <ThemedText>
           Esta aplicación permite conectarse a dispositivos Arduino mediante{' '}
-          <ThemedText type="defaultSemiBold">Bluetooth Low Energy (BLE)</ThemedText> para recibir 
+          <ThemedText type="defaultSemiBold">Bluetooth Low Energy (BLE)</ThemedText> para recibir
           comandos y mostrar imágenes correspondientes en tiempo real.
         </ThemedText>
       </ThemedView>
@@ -75,11 +95,13 @@ export default function HomeScreen(): JSX.Element {
       <ThemedView style={styles.stepContainer}>
         <Link href="/arduino">
           <Link.Trigger>
-            <ThemedView style={styles.linkButton}>
-              <ThemedText type="subtitle" style={styles.linkText}>
-                🔗 Ir a Control Arduino
-              </ThemedText>
-            </ThemedView>
+            <Animated.View style={ctaStyle as any}>
+              <ThemedView style={styles.linkButton}>
+                <ThemedText type="subtitle" style={styles.linkText}>
+                  🔗 Ir a Control Arduino
+                </ThemedText>
+              </ThemedView>
+            </Animated.View>
           </Link.Trigger>
         </Link>
         <ThemedText>
@@ -87,69 +109,18 @@ export default function HomeScreen(): JSX.Element {
         </ThemedText>
       </ThemedView>
 
-      <ThemedView style={styles.featuresContainer}>
-        <ThemedText type="subtitle">✨ Características</ThemedText>
-        <View style={styles.featuresList}>
-          <View style={styles.featureItem}>
-            <ThemedText style={styles.featureIcon}>📡</ThemedText>
-            <ThemedText style={styles.featureText}>Conexión BLE en tiempo real</ThemedText>
-          </View>
-          <View style={styles.featureItem}>
-            <ThemedText style={styles.featureIcon}>🖼️</ThemedText>
-            <ThemedText style={styles.featureText}>Visualización de comandos</ThemedText>
-          </View>
-          <View style={styles.featureItem}>
-            <ThemedText style={styles.featureIcon}>🎮</ThemedText>
-            <ThemedText style={styles.featureText}>Interfaz intuitiva</ThemedText>
-          </View>
-          <View style={styles.featureItem}>
-            <ThemedText style={styles.featureIcon}>⚡</ThemedText>
-            <ThemedText style={styles.featureText}>Respuesta instantánea</ThemedText>
-          </View>
+      <ThemedView style={styles.featuresContainerCompact}>
+        <ThemedText type="subtitle">✨ Lo esencial</ThemedText>
+        <View style={styles.featuresCompactRow}>
+          <ThemedText style={styles.featureText}>Conexión BLE · Visualización · Respuesta</ThemedText>
         </View>
       </ThemedView>
 
-      <ThemedView style={styles.techContainer}>
-        <ThemedText type="subtitle">🛠️ Tecnologías</ThemedText>
-        <View style={styles.techGrid}>
-          <View style={styles.techItem}>
-            <ThemedText style={styles.techIcon}>⚛️</ThemedText>
-            <ThemedText style={styles.techName}>React Native</ThemedText>
-          </View>
-          <View style={styles.techItem}>
-            <ThemedText style={styles.techIcon}>📱</ThemedText>
-            <ThemedText style={styles.techName}>Expo Router</ThemedText>
-          </View>
-          <View style={styles.techItem}>
-            <ThemedText style={styles.techIcon}>🔵</ThemedText>
-            <ThemedText style={styles.techName}>BLE PLX</ThemedText>
-          </View>
-          <View style={styles.techItem}>
-            <ThemedText style={styles.techIcon}>🤖</ThemedText>
-            <ThemedText style={styles.techName}>Arduino</ThemedText>
-          </View>
-        </View>
-      </ThemedView>
-
-      <ThemedView style={styles.instructionsContainer}>
-        <ThemedText type="subtitle">📋 Instrucciones de Uso</ThemedText>
-        <View style={styles.instructionsList}>
-          <ThemedText style={styles.instructionStep}>
-            <ThemedText type="defaultSemiBold">1.</ThemedText> Enciende tu dispositivo Arduino con módulo BLE
-          </ThemedText>
-          <ThemedText style={styles.instructionStep}>
-            <ThemedText type="defaultSemiBold">2.</ThemedText> Ve a la pestaña "Arduino" en la aplicación
-          </ThemedText>
-          <ThemedText style={styles.instructionStep}>
-            <ThemedText type="defaultSemiBold">3.</ThemedText> Presiona "Buscar Dispositivos BLE"
-          </ThemedText>
-          <ThemedText style={styles.instructionStep}>
-            <ThemedText type="defaultSemiBold">4.</ThemedText> Selecciona tu Arduino de la lista
-          </ThemedText>
-          <ThemedText style={styles.instructionStep}>
-            <ThemedText type="defaultSemiBold">5.</ThemedText> ¡Disfruta viendo los comandos en tiempo real!
-          </ThemedText>
-        </View>
+      <ThemedView style={styles.instructionsContainerCompact}>
+        <ThemedText type="subtitle">📋 Cómo empezar</ThemedText>
+        <ThemedText style={styles.instructionShort}>1. Enciende tu Arduino con BLE</ThemedText>
+        <ThemedText style={styles.instructionShort}>2. Ve a la pestaña Arduino</ThemedText>
+        <ThemedText style={styles.instructionShort}>3. Presiona Buscar Dispositivos BLE</ThemedText>
       </ThemedView>
 
     </ParallaxScrollView>
@@ -158,7 +129,7 @@ export default function HomeScreen(): JSX.Element {
 
 const styles = StyleSheet.create({
   headerGradient: {
-    height: 250,
+    height: 280,
     width: '100%',
   },
   headerContent: {
@@ -166,6 +137,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
+    paddingTop: 28,
+    paddingBottom: 12,
   },
   iconContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
@@ -174,14 +147,23 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   iconText: {
-    fontSize: 40,
+    fontSize: 42,
+    lineHeight: 48,
+  },
+  iconContainerFixed: {
+    backgroundColor: 'rgba(255, 255, 255, 0.18)',
+    borderRadius: 40,
+    padding: 18,
+    marginBottom: 12,
+    overflow: 'visible',
   },
   courseTitle: {
     fontSize: 32,
     fontWeight: 'bold',
     color: '#fff',
     textAlign: 'center',
-    marginBottom: 5,
+    marginBottom: 6,
+    lineHeight: 40,
   },
   courseSubtitle: {
     fontSize: 18,
@@ -320,5 +302,63 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(33, 150, 243, 0.1)',
     borderLeftWidth: 4,
     borderLeftColor: '#2196F3',
+  },
+  /* new compact-summary styles */
+  summaryCardContainer: {
+    marginBottom: 18,
+    paddingHorizontal: 10,
+  },
+  summaryCard: {
+    padding: 16,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
+  },
+  summaryTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  summarySubtitle: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.85)',
+    marginBottom: 12,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  summaryItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  summaryIcon: {
+    fontSize: 20,
+    marginBottom: 6,
+  },
+  summaryText: {
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  participantsCompact: {
+    marginTop: 8,
+  },
+  /* compact features */
+  featuresContainerCompact: {
+    marginBottom: 18,
+  },
+  featuresCompactRow: {
+    paddingHorizontal: 10,
+  },
+  instructionShort: {
+    fontSize: 14,
+    marginBottom: 6,
+  },
+  instructionsContainerCompact: {
+    gap: 8,
+    marginBottom: 20,
+    paddingHorizontal: 10,
   },
 });

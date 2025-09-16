@@ -132,7 +132,7 @@ export default function ArduinoScreen(): JSX.Element {
             if (!exists) {
               const newDevice: DeviceItem = {
                 id: device.id,
-                name: device.name || "",
+                name: "" + device.name,
                 rssi: device.rssi || undefined,
                 device: device
               };
